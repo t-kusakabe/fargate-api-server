@@ -1,5 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -20,6 +21,17 @@ export class CdkStack extends cdk.Stack {
           subnetType: ec2.SubnetType.PRIVATE
         }
       ]
+    });
+
+    // === NLB ===
+    const publicSubnets = vpc.selectSubnets({
+      subnetType: ec2.SubnetType.PUBLIC
+    }).subnets;
+
+    new elbv2.NetworkLoadBalancer(this, 'NLB', {
+      vpc: vpc,
+      loadBalancerName: 'network-loadbalancer',
+      vpcSubnets: { subnets: publicSubnets }
     });
   }
 }

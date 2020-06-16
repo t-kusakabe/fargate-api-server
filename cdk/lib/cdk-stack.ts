@@ -2,6 +2,8 @@ import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 
+import nlbFunction from './recipes/ELB/network-loadbalancer';
+
 export class CdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -28,10 +30,11 @@ export class CdkStack extends cdk.Stack {
       subnetType: ec2.SubnetType.PUBLIC
     }).subnets;
 
-    new elbv2.NetworkLoadBalancer(this, 'NLB', {
+    nlbFunction({
+      context: this,
       vpc: vpc,
-      loadBalancerName: 'network-loadbalancer',
-      vpcSubnets: { subnets: publicSubnets }
+      name: 'network-loadbalancer',
+      publicSubnets: publicSubnets
     });
   }
 }
